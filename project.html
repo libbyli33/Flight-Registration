@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <title>Final Project</title>
+  <body background="background_pic2.jpg"></body>
+  <script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+  <script src="http://www.cs.unc.edu/~kmp/comp426fall18/jquery-3.3.1.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <script src="logic.js"></script>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Sigmar+One" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Quattrocento" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Gamja+Flower" rel="stylesheet">
+  <script>
+//facebook API
+window.fbAsyncInit = function() {
+        FB.init({
+          appId      : '1452677964876209',
+          cookie     : true,
+          xfbml      : true,
+          version    : 'v2.8'
+        });
+          
+      };
+    
+      (function(d, s, id){
+         var js, fjs = d.getElementsByTagName(s)[0];
+         if (d.getElementById(id)) {return;}
+         js = d.createElement(s); js.id = id;
+         js.src = "https://connect.facebook.net/en_US/sdk.js";
+         fjs.parentNode.insertBefore(js, fjs);
+       }(document, 'script', 'facebook-jssdk'));
+    
+       function checkLoginState() {
+      FB.getLoginStatus(function(response) {
+        
+        console.log(response);
+        statusChangeCallback(response);
+        if(response.status=="connected"){
+          let user = "issacqi";
+        let pass = "111111";
+        $.ajax(mainUrl + 'sessions', {
+            type: 'POST',
+            xhrFields: {
+                withCredentials: true
+            },
+            data: {
+                user: {
+                    username: user,
+                    password: pass
+                }
+            },
+            async:false,
+            success: function () {
+                build_main_interface();
+            },
+            error: function () {
+                alert('username/password is incorrect');
+            }
+        });
+      
+      }
+      });
+    }
+    function statusChangeCallback(response){
+      FB.api('/me', function(response) {
+        if(typeof response.name!="undefined"){
+        console.log('Successful login for: ' + response.name);}
+        });
+        
+    }
+    
+    function logout(response){
+        FB.logout(function(response){
+     
+        console.log("log out");
+        });
+          
+    }
+</script>
+
+<!-- google api -->
+
+  
+    <script>
+      // This example adds an animated symbol to a polyline.
+
+      function initMap() {
+        console.log("success");
+        let source = $("#source").val();
+        let destination = $("#destination").val();
+        let source_latitude=0;
+        let source_longitude=0;
+        let destination_latitude=0;
+        let destination_longitude=0;
+        $.ajax("http://comp426.cs.unc.edu:3001/airports",{
+          type: 'GET',
+            xhrFields: {
+                withCredentials: true
+            },
+            async:false,
+            success: function (response) {
+                for(t=0;t<response.length;t++){
+                  if(response[t].city==source){
+                    source_latitude=parseFloat(response[t].latitude);
+                    console.log(source_latitude);
+                    source_longitude=parseFloat(response[t].longitude);
+                    console.log(source_latitude);
+                  }
+                }
+            },
+            error: function () {
+                alert('fail');
+            }
+        });
+        $.ajax("http://comp426.cs.unc.edu:3001/airports",{
+          type: 'GET',
+            xhrFields: {
+                withCredentials: true
+            },
+            async:false,
+            success: function (response) {
+                for(t=0;t<response.length;t++){
+                  if(response[t].city==destination){
+                    destination_latitude=parseFloat(response[t].latitude);
+                    console.log(destination_latitude);
+                    destination_longitude=parseFloat(response[t].longitude);
+                    console.log(destination_longitude);
+                  }
+                }
+            },
+            error: function () {
+                alert('fail');
+            }
+        });
+        var middle_latitude=(source_latitude+destination_latitude)/2;
+        console.log(middle_latitude);
+        var middle_longitude=(source_longitude+destination_longitude)/2;
+        console.log(middle_longitude);
+        var map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: middle_latitude, lng: middle_longitude},
+          zoom: 6,
+          mapTypeId: 'terrain'
+        });
+
+        // Define the symbol, using one of the predefined paths ('CIRCLE')
+        // supplied by the Google Maps JavaScript API.
+        var lineSymbol = {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 8,
+          strokeColor: '#393'
+        };
+
+        // Create the polyline and add the symbol to it via the 'icons' property.
+        var line = new google.maps.Polyline({
+          path: [{lat: source_latitude, lng: source_longitude}, {lat: destination_latitude, lng: destination_longitude}],
+          icons: [{
+            icon: lineSymbol,
+            offset: '100%'
+          }],
+          map: map
+        });
+
+        animateCircle(line);
+        
+      }
+
+      // Use the DOM setInterval() function to change the offset of the symbol
+      // at fixed intervals.
+      function animateCircle(line) {
+          var count = 0;
+          window.setInterval(function() {
+            count = (count + 1) % 200;
+
+            var icons = line.get('icons');
+            icons[0].offset = (count / 2) + '%';
+            line.set('icons', icons);
+        }, 20);
+      }
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQIjxKPQ80l2uJ3kBcIGdGlmMfXRfHiZI&callback=initMap">
+    </script>
+ 
+
+
+
+
+
+
+
+
+
+  <!-- <script src="autocomplete.js"></script> -->
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+  <div id="body">
+    <span style="font-size: 80px; color: #1a1a1a;">
+      <i class="fas fa-globe-americas"></i>
+    </span> <span class = "flight_regis_header">Flight Registration</span>
+ 
+
+
+  <div id="login_div">
+      <span style="font-size: 30px; color: #1a1a1a;">
+          <i class="fas fa-user"></i>
+        </span> 
+    <span class = "login_user_span">User: </span><input type="text" id="login_user"><br>
+    <span style="font-size: 30px; color: #1a1a1a;">
+        <i class="fas fa-key"></i>
+      </span> 
+    <span class = "login_password_span">Password: </span><input type="password" id="login_pass"><br>
+    <button id="login_btn"><span>Login</span></button>
+  </div>
+
+  <span id="register">Click here to create a new account</span>
+  <br>
+  <span id="change_pass">Click here to change your password</span>
+
+  <div id="mesg_div"></div>
+</div>
+
+
+  <div id="loginBtn">
+    <fb:login-button data-max-rows="1" data-size="large" scope="public_profile,email" display="block" onlogin="checkLoginState();">
+    </fb:login-button>
+  </div>
+
+</body>
+
+</html>
